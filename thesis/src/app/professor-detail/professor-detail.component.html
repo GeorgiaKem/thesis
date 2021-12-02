@@ -1,0 +1,68 @@
+<p>professor-detail selected with id = {{ professorId }}</p>
+<a (click)="goPrevious()">Previous</a>
+<a (click)="goNext()">Next</a>
+
+<div>
+  <button (click)="goToProfessors()" type="button" class="btn btn-secondary">Back</button>
+</div>
+
+<div class="container">
+<div class="row">
+  <div class="col-12 text-center">
+    <div ngbDropdown class="d-inline-block">
+      <button class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle><ng-container *ngIf="selectedAcadYear == null">Ακαδημαικό έτος</ng-container><ng-container *ngIf="selectedAcadYear != null">{{selectedAcadYearName}}</ng-container></button>
+      <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+        <button ngbDropdownItem *ngFor="let sem of semester_list" (click)="onSelectAcademyYear($event)" [value]=sem.sem_id>{{sem.semester}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+
+    <div class="col-6">
+      <h3 class="text-center">Courses</h3>
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Active</th>
+          <th scope="col">Name</th>
+          <th scope="col">Examino</th>
+          <th scope="col">Course Type</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let course of courses_list;">
+          <ng-container *ngIf="selectedAcadYear != null" >
+            <ng-container *ngIf="course.sem_id == selectedAcadYear">
+              <th>{{course.course_id}}</th>
+              <th scope="row">{{course.is_active}}</th>
+              <td (click)="onSelectedCourse(course)">{{ course.desc }}</td>
+              <td>{{ course.examino }}</td>
+              <td>{{ course.course_type }}</td>
+            </ng-container>
+          </ng-container>
+
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-6">
+      <h4 class="text-center">Details</h4>
+      <hr>
+      <div class="text-center">
+        <h4>Title:</h4>
+        <p *ngIf="selectedCourseTitle != null">{{selectedCourseTitle}}</p>
+
+        <h4>Type:</h4>
+        <p *ngIf="selectedCourseType != null">{{selectedCourseType}}</p>
+
+        <h4>Teach Hours:</h4>
+        <p *ngIf="selectedCourseType != null">{{selectedCourseTeachHours}}</p>
+
+      </div>
+
+    </div>
+
+  </div>

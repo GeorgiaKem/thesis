@@ -1,0 +1,148 @@
+
+
+
+<div class="container">
+  <div class="row">
+
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="text-center">Contracts</h3>
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Active</th>
+          <th scope="col">Starts at</th>
+          <th scope="col">Ends at</th>
+          <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let contract of contract_list;">
+          <td scope="row">{{contract.title}}</td>
+          <td scope="row">{{contract.status}}</td>
+          <td scope="row">{{contract.starts_at}}</td>
+          <td scope="row">{{contract.ends_at}}</td>
+          <td style="display:inline-block;">
+            <button style="margin-right: 5px;" (click)="onSelected(contract.id)" type="button" class="btn btn-secondary btn-sm">View</button>
+            <button style="margin-right: 5px;" (click)="onSelected(contract.id,true)" type="button" class="btn btn-warning btn-sm">Edit</button>
+            <button (click)="onDelete(contract.id)" type="button" class="btn btn-danger btn-sm">Edit</button>
+          </td>
+
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" [class.active]="details_tab" (click)="selectedTab('details')" id="home-tab" data-toggle="tab" href="javascript:void(0);" role="tab" aria-controls="home" aria-selected="true">Details</a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" [class.active]="new_contract_tab" (click)="selectedTab('new_contract')" id="profile-tab" data-toggle="tab" href="javascript:void(0);" role="tab" aria-controls="profile" aria-selected="false">New Contract</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show" [class.active]="details_tab" id="home" role="tabpanel" aria-labelledby="home-tab">
+          <div class="text-center">
+            <h4>Title:</h4>
+            <p *ngIf="currentContract != null">{{currentContract.title}}</p>
+
+            <h4>PDF:</h4>
+            <p *ngIf="currentContract != null">{{currentContract.url}}</p>
+            <h4>Status:</h4>
+            <p *ngIf="currentContract != null">{{currentContract.description}}</p>
+
+            <h4>Starts At:</h4>
+            <p *ngIf="currentContract != null">{{currentContract.startsAt}}</p>
+
+            <h4>Ends At:</h4>
+            <p *ngIf="currentContract != null">{{currentContract.endsAt}}</p>
+
+          </div>
+        </div>
+        <div class="tab-pane fade show" [class.active]="new_contract_tab" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+          <form #contractForm="ngForm" (ngSubmit)="onSubmit()" novalidate>
+
+{{contractForm.value | json}}
+
+            <div class="form-group d-none">
+            <input type="text" name="prof_id" class="form-control" [(ngModel)]="contractModel.prof_id">
+            </div>
+
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" name="title" class="form-control" [(ngModel)]="contractModel.title">
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea class="form-control" name="description" [(ngModel)]="contractModel.description"></textarea>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <input name="datepicker"
+                       class="form-control"
+                       ngbDatepicker
+                       #datepicker="ngbDatepicker"
+                       [autoClose]="'outside'"
+                       (dateSelect)="onDateSelection($event)"
+                       [displayMonths]="2"
+                       [dayTemplate]="t"
+                       outsideDays="hidden"
+                       [startDate]="fromDate!"
+                       tabindex="-1">
+                <ng-template #t let-date let-focused="focused">
+                  <span class="custom-day"
+                        [class.focused]="focused"
+                        [class.range]="isRange(date)"
+                        [class.faded]="isHovered(date) || isInside(date)"
+                        (mouseenter)="hoveredDate = date"
+                        (mouseleave)="hoveredDate = null">
+                    {{ date.day }}
+                  </span>
+                </ng-template>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <input #dpFromDate
+                      [(ngModel)]=contractModel.startsAt
+                       class="form-control" placeholder="yyyy-mm-dd"
+                       name="dpFromDate"
+                       [value]="formatter.format(fromDate)"
+                       (input)="fromDate = validateInput(fromDate, dpFromDate.value)">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button"></button>
+                </div>
+              </div>
+            </div>
+            <div class="form-group ml-2">
+              <div class="input-group">
+                <input #dpToDate
+                [(ngModel)]=contractModel.endsAt
+                       class="form-control" placeholder="yyyy-mm-dd"
+                       name="dpToDate"
+                       [value]="formatter.format(toDate)"
+                       (input)="toDate = validateInput(toDate, dpToDate.value)">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button"></button>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Submit new contract</button>
+
+
+
+          </form>
+        </div>
+      </div>
+
+      <!-- <h3 class="text-center">Details</h3> -->
+
+
+    </div>
+
+  </div>
+</div>

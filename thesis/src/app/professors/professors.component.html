@@ -1,0 +1,34 @@
+<p>professors works!</p>
+
+<div class="container">
+  <div class="row">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Name</th>
+          <th scope="col">Uname</th>
+          <th scope="col">Email</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <h2>{{errorMsg}}</h2>
+
+          <tr *ngFor="let prof of professors_list">
+              <td>{{prof.prof_id}}</td>
+              <td>{{prof.full_name}}</td>
+              <td>{{prof.uname}}</td>
+              <td>{{prof.email}}</td>
+              <td style="display: inline-block;">
+                <button style="margin-right: 5px;" (click)="onSelectCourses(prof)" type="button" class="btn btn-primary btn-sm">Courses</button>
+                <button (click)="onSelectContract(prof)" type="button" class="btn btn-primary btn-sm">Contract</button>
+              </td>
+
+          </tr>
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
