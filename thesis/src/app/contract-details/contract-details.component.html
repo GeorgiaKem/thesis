@@ -22,12 +22,12 @@
         <tr *ngFor="let contract of contract_list;">
           <td scope="row">{{contract.title}}</td>
           <td scope="row">{{contract.status}}</td>
-          <td scope="row">{{contract.starts_at}}</td>
-          <td scope="row">{{contract.ends_at}}</td>
+          <td scope="row">{{contract.starts_at | date: 'dd/MM/yyyy'}}</td>
+          <td scope="row">{{contract.ends_at | date: 'dd/MM/yyyy'}}</td>
           <td style="display:inline-block;">
             <button style="margin-right: 5px;" (click)="onSelected(contract.id)" type="button" class="btn btn-secondary btn-sm">View</button>
             <button style="margin-right: 5px;" (click)="onSelected(contract.id,true)" type="button" class="btn btn-warning btn-sm">Edit</button>
-            <button (click)="onDelete(contract.id)" type="button" class="btn btn-danger btn-sm">Edit</button>
+            <!-- <button (click)="onDelete(contract.id)" type="button" class="btn btn-danger btn-sm">Delete</button> -->
           </td>
 
         </tr>
@@ -40,7 +40,7 @@
           <a class="nav-link" [class.active]="details_tab" (click)="selectedTab('details')" id="home-tab" data-toggle="tab" href="javascript:void(0);" role="tab" aria-controls="home" aria-selected="true">Details</a>
         </li>
         <li class="nav-item" role="presentation">
-          <a class="nav-link" [class.active]="new_contract_tab" (click)="selectedTab('new_contract')" id="profile-tab" data-toggle="tab" href="javascript:void(0);" role="tab" aria-controls="profile" aria-selected="false">New Contract</a>
+          <a class="nav-link" [class.active]="new_contract_tab" (click)="selectedTab('new_contract')" id="profile-tab" data-toggle="tab" href="javascript:void(0);" role="tab" aria-controls="profile" aria-selected="false">{{ formState}}</a>
         </li>
       </ul>
       <div class="tab-content" id="myTabContent">
@@ -50,20 +50,21 @@
             <p *ngIf="currentContract != null">{{currentContract.title}}</p>
 
             <h4>PDF:</h4>
-            <p *ngIf="currentContract != null">{{currentContract.url}}</p>
+            <button *ngIf="currentContract != null" class="btn btn-primary" (click)="download(currentContract)">Download</button>
+            <!-- <p *ngIf="currentContract != null">{{currentContract.path}}</p> -->
             <h4>Status:</h4>
-            <p *ngIf="currentContract != null">{{currentContract.description}}</p>
+            <p *ngIf="currentContract != null">{{currentContract.status == 1 ? 'enable' : 'disable'}}</p>
 
             <h4>Starts At:</h4>
-            <p *ngIf="currentContract != null">{{currentContract.startsAt}}</p>
+            <p *ngIf="currentContract != null">{{currentContract.starts_at | date: 'dd/MM/yyyy'}}</p>
 
             <h4>Ends At:</h4>
-            <p *ngIf="currentContract != null">{{currentContract.endsAt}}</p>
+            <p *ngIf="currentContract != null">{{currentContract.ends_at | date: 'dd/MM/yyyy'}}</p>
 
           </div>
         </div>
         <div class="tab-pane fade show" [class.active]="new_contract_tab" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-          <form #contractForm="ngForm" (ngSubmit)="onSubmit()" novalidate>
+          <form #contractForm="ngForm" (ngSubmit)="onSubmit(contractForm);" novalidate>
 
 {{contractForm.value | json}}
 
@@ -79,59 +80,45 @@
               <label>Description</label>
               <textarea class="form-control" name="description" [(ngModel)]="contractModel.description"></textarea>
             </div>
-            <div class="form-group">
-              <div class="input-group">
-                <input name="datepicker"
-                       class="form-control"
-                       ngbDatepicker
-                       #datepicker="ngbDatepicker"
-                       [autoClose]="'outside'"
-                       (dateSelect)="onDateSelection($event)"
-                       [displayMonths]="2"
-                       [dayTemplate]="t"
-                       outsideDays="hidden"
-                       [startDate]="fromDate!"
-                       tabindex="-1">
-                <ng-template #t let-date let-focused="focused">
-                  <span class="custom-day"
-                        [class.focused]="focused"
-                        [class.range]="isRange(date)"
-                        [class.faded]="isHovered(date) || isInside(date)"
-                        (mouseenter)="hoveredDate = date"
-                        (mouseleave)="hoveredDate = null">
-                    {{ date.day }}
-                  </span>
-                </ng-template>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="input-group">
-                <input #dpFromDate
-                      [(ngModel)]=contractModel.startsAt
-                       class="form-control" placeholder="yyyy-mm-dd"
-                       name="dpFromDate"
-                       [value]="formatter.format(fromDate)"
-                       (input)="fromDate = validateInput(fromDate, dpFromDate.value)">
-                <div class="input-group-append">
-                  <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button"></button>
-                </div>
-              </div>
-            </div>
-            <div class="form-group ml-2">
-              <div class="input-group">
-                <input #dpToDate
-                [(ngModel)]=contractModel.endsAt
-                       class="form-control" placeholder="yyyy-mm-dd"
-                       name="dpToDate"
-                       [value]="formatter.format(toDate)"
-                       (input)="toDate = validateInput(toDate, dpToDate.value)">
-                <div class="input-group-append">
-                  <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button"></button>
-                </div>
-              </div>
-            </div>
+            <mat-form-field appearance="fill">
+              <mat-label>Enter a date range</mat-label>
+              <mat-date-range-input [rangePicker]="picker">
+                <input matStartDate name="from" placeholder="Start date" [(ngModel)]="contractModel.starts_at">
+                <input matEndDate name="until" placeholder="End date" [(ngModel)]="contractModel.ends_at">
+              </mat-date-range-input>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-date-range-picker #picker></mat-date-range-picker>
+            </mat-form-field>
+            <!-- <ngb-datepicker #dp (dateSelect)="onDateSelection($event)" [displayMonths]="2" [dayTemplate]="t" outsideDays="hidden">
+            </ngb-datepicker>
+            
+            <ng-template #t let-date let-focused="focused">
+              <span class="custom-day"
+                    [class.focused]="focused"
+                    [class.range]="isRange(date)"
+                    [class.faded]="isHovered(date) || isInside(date)"
+                    (mouseenter)="hoveredDate = date"
+                    (mouseleave)="hoveredDate = null">
+                    
+                {{ date.day }}
+              </span>
+            </ng-template> -->
+            <!-- <pre>From: {{ starts_at | json }} </pre>
+<pre>To: {{ ends_at | json }} </pre> -->
+
+<div class="row">
+  <div class="col-8">
+    <label class="btn btn-default p-0">
+      <input class="form-control" accept="image/*" type="file" (change)="onFileSelected($event)" #fileUpload/>
+    </label>
+  </div>
+
+
+</div>
+          
 
             <button class="btn btn-primary" type="submit">Submit new contract</button>
+            <button class="btn btn-primary" (click)="resetForm(contractForm)">Reset</button>
 
 
 

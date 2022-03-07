@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use Laravel\Socialite\Facades\Socialite;
 
 class PassportAuthController extends Controller
 {
@@ -46,16 +45,5 @@ class PassportAuthController extends Controller
         } else {
             return response()->json(['error' => 'Unauthorised'], 401);
         }
-    } 
-    
-    public function signIn()
-    {
-        return Socialite::driver('iee')->redirect();
-    }
-
-    public function redirect(){
-        $user = Socialite::driver('iee')->user();
-        $this->login($user);
-        return redirect(route('announcements'));
-    }
+    }   
 }

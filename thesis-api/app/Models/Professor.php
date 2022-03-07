@@ -10,7 +10,6 @@ use App\Models\AcademyYear;
 use App\Models\Course;
 use App\Models\Assignment;
 use App\Models\Contract;
-use App\Models\Permit;
 
 class Professor extends Model
 {
@@ -66,11 +65,6 @@ class Professor extends Model
     public function contracts()
     {
         return $this->hasMany(Contract::class, 'prof_id', 'prof_id');
-    }
-
-    public function permits()
-    {
-        return $this->hasMany(Permit::class, 'prof_id', 'prof_id');
     }
 
 }

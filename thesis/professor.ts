@@ -10,5 +10,6 @@ export interface IProfessor {
     email: string,
     default_full_hours: number,
     semesters: [],
-    contracts: {}
+    contracts: {},
+    permits: {}
 }

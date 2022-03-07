@@ -6,7 +6,6 @@ use App\Http\Controllers\PassportAuthController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\AcademyYearController;
 use App\Http\Controllers\ContractController;
-use App\Http\Controllers\PermitController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,18 +27,8 @@ Route::get('acad_list', [AcademyYearController::class, 'index']);
 Route::post('contract/create',[ContractController::class, 'store']);
 Route::get('contract/show/{id}',[ContractController::class, 'show']);
 Route::post('contract/update/{id}',[ContractController::class, 'update']);
-Route::post('contract/download',[ContractController::class, 'download']);
-
-Route::post('permit/create',[PermitController::class, 'store']);
-Route::post('permit/update/{id}',[PermitController::class, 'update']);
-
-Route::get('sign-in', [PassportAuthController::class, 'signIn'])->name('login');
-Route::get('/sign-in/redirect', 'Auth\AuthController@redirect');
-
-
 
 Route::middleware('auth:api')->group(function () {
     Route::resource('posts', PostController::class);
-    
 
 });

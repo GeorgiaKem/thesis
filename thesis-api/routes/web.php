@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PassportAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +16,3 @@ use App\Http\Controllers\PassportAuthController;
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::get('sign-in', [PassportAuthController::class, 'signIn'])->name('login');
-Route::get('/sign-in/redirect', [PassportAuthController::class, 'redirect']);
-
