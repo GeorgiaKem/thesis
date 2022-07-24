@@ -19,10 +19,14 @@ export class ProfessorDetailComponent implements OnInit {
   public selectedAcadYearName = null;
 
   public selectedCourseTitle = null;
+  public selectedType = null;
+  public selectedHours = null;
   public selectedCourseTeachHours = null;
   public selectedCourseType = null;
+  public is_monimos1 = true;
+  public prof_name = null;
 
-  constructor(private route: ActivatedRoute, private _professorsService: ProfessorsService, private router: Router ) { }
+  constructor(private route: ActivatedRoute, private _professorsService: ProfessorsService, private router: Router) { }
 
   ngOnInit(): void {
     // let id = parseInt(this.route.snapshot.paramMap.get('id'));
@@ -34,37 +38,68 @@ export class ProfessorDetailComponent implements OnInit {
     });
 
     this._professorsService.getProfessorById(this.professorId)
-      .subscribe(data => this.semester_list = Object.entries(data)[10][1],
-                  error => this.errorMsg = error);
+      .subscribe(data => {
+
+        if (Object.entries(data)[6][1]) {
+          this.is_monimos1 = true
+        } else {
+          this.is_monimos1 = false
+        }
+        this.prof_name = Object.entries(data)[3][1]
+
+        this.semester_list = Object.entries(data)[12][1]
+        if (this.semester_list.length != 0) {
+          this.selectedAcadYear = this.semester_list[this.semester_list.length - 1].sem_id;
+          this.selectedAcadYearName = this.semester_list[this.semester_list.length - 1].semester;
+        }
+
+      },
+        error => this.errorMsg = error);
 
     this._professorsService.getProfessorById(this.professorId)
-      .subscribe(data => this.courses_list = Object.entries(data)[11][1],
-                  error => this.errorMsg = error);
+      .subscribe(data => this.courses_list = Object.entries(data)[13][1],
+        error => this.errorMsg = error);
   }
 
-  onSelectAcademyYear(event){
+
+  changeType(event) {
+    let state = event.offsetParent.parentElement['attributes'][2].value
+    if (state == 'false') {
+      state = false;
+    } else {
+      state = true;
+    }
+    console.log(state)
+    this._professorsService.editType(this.professorId, state)
+      .subscribe(
+        error => this.errorMsg = error
+      )
+
+  }
+
+  onSelectAcademyYear(event) {
     this.selectedAcadYear = event.target.value;
     this.selectedAcadYearName = event.target.textContent;
   }
 
-  goPrevious(){
+  goPrevious() {
     let previousId = this.professorId - 1;
     this.router.navigate(['/professor', previousId]);
   }
 
-  goNext(){
+  goNext() {
     let nextId = this.professorId + 1;
     this.router.navigate(['/professor', nextId]);
   }
 
-  onSelectedCourse(course){
+  onSelectedCourse(course) {
     console.log(course)
     this.selectedCourseTitle = course.desc;
     this.selectedCourseType = course.course_type;
     this.selectedCourseTeachHours = course.teach_hours
   }
 
-  goToProfessors(){
+  goToProfessors() {
     let selectedId = this.professorId ? this.professorId : null;
   }
 

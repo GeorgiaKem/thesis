@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IProfessor } from 'professor';
 import { Observable } from 'rxjs';
@@ -13,22 +13,61 @@ export class ProfessorsService {
 
   private _url: string = "http://thesis-api.test/api/professors";
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   getProfessors(): Observable<IProfessor[]> {
 
-    return this.http.get<IProfessor[]>(this._url)
-              .pipe(catchError(this.errorHandler));
+    let token = localStorage.getItem('access_token');
+
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.get<IProfessor[]>(this._url, { headers: headers })
+      .pipe(catchError(this.errorHandler));
+
+  }
+
+  editType(id: number, state: boolean) {
+    let token = localStorage.getItem('access_token');
+
+    let httpHeaders = new HttpHeaders({
+      'Access-Control-Allow-Origin': 'http://localhost:4200',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Cache-Control': 'no-cache',
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+
+    });
+
+    let _url1 = "http://thesis-api.test/api/professor/edit/" + id
+    return this.http.post<any>(_url1, JSON.stringify({ state: state }), { headers: httpHeaders })
+      .pipe(catchError(this.errorHandler));
 
   }
 
   getProfessorById(id: number): Observable<IProfessor[]> {
-    let _url1 = "http://thesis-api.test/api/professor/"+id
-    return this.http.get<IProfessor[]>(_url1)
-              .pipe(catchError(this.errorHandler));
+
+    let token = localStorage.getItem('access_token');
+
+    let httpHeaders = new HttpHeaders({
+      'Access-Control-Allow-Origin': 'http://localhost:4200',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Cache-Control': 'no-cache',
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+
+    });
+    let _url1 = "http://thesis-api.test/api/professor/" + id
+    return this.http.get<IProfessor[]>(_url1, { headers: httpHeaders })
+      .pipe(catchError(this.errorHandler));
   }
 
-  errorHandler(error: HttpErrorResponse){
+  errorHandler(error: HttpErrorResponse) {
+    if (error.statusText == "Unauthorized") {
+      localStorage.removeItem('access_token');
+      window.location.href = 'http://thesis-api.test/sign-in';
+    }
+    console.log(error.message)
     return Observable.throw(error.message || "Server Error");
   }
 }

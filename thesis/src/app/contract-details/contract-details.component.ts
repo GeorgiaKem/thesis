@@ -2,20 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { ProfessorsService } from '../professors.service';
 import { ContractService } from '../contract.service';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
-import {NgbDate, NgbCalendar, NgbDateParserFormatter} from '@ng-bootstrap/ng-bootstrap';
+import { NgbDate, NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
 import { Contract } from '../contract';
+import { NgForm } from '@angular/forms';
+import {
+  DatePipe
+} from '@angular/common';
+import * as fileSaver from 'file-saver';
 
 @Component({
   selector: 'app-contract-details',
   templateUrl: './contract-details.component.html',
   styleUrls: ['./contract-details.component.css'],
   styles: [`
-    .form-group.hidden {
-      width: 0;
-      margin: 0;
-      border: none;
-      padding: 0;
-    }
     .custom-day {
       text-align: center;
       padding: 0.185rem 0.25rem;
@@ -34,13 +33,12 @@ import { Contract } from '../contract';
       background-color: rgba(2, 117, 216, 0.5);
     }
   `]
+
 })
+
 export class ContractDetailsComponent implements OnInit {
+  public fileName = '';
 
-  hoveredDate: NgbDate | null = null;
-
-  fromDate: NgbDate | null;
-  toDate: NgbDate | null;
 
   public contract_list = null;
   public professorId = 0;
@@ -55,12 +53,15 @@ export class ContractDetailsComponent implements OnInit {
   public contractId = null;
   public editResponse = null;
 
+  public semester_list = null;
+  public selectedAcadYear = null;
+  public selectedAcadYearName = null;
+  public profType = null;
 
 
-  constructor(private calendar: NgbCalendar, public formatter: NgbDateParserFormatter,private _contractService: ContractService,private _professorsService: ProfessorsService,private route: ActivatedRoute) {
-    this.fromDate = calendar.getToday();
-    this.toDate = calendar.getNext(calendar.getToday(), 'd', 10);
-   }
+
+  constructor(private _contractService: ContractService, private _professorsService: ProfessorsService, private route: ActivatedRoute) {
+  }
 
   ngOnInit(): void {
 
@@ -70,109 +71,176 @@ export class ContractDetailsComponent implements OnInit {
 
     });
 
+    this._contractService.getSemesterList()
+      .subscribe(data => {
+        this.semester_list = data;
+        if (this.semester_list.length != 0) {
+          this.selectedAcadYear = this.semester_list[this.semester_list.length - 1].sem_id;
+          this.selectedAcadYearName = this.semester_list[this.semester_list.length - 1].semester;
+        }
+      })
+
 
     this._professorsService.getProfessorById(this.professorId)
-      .subscribe(data => this.contract_list = Object.entries(data)[12][1],
-                  error => this.errorMsg = error);
+      .subscribe(data => {
+        this.contract_list = Object.entries(data)[14][1]
+        console.log(Object.entries(data))
+        this.profType = Object.entries(data)[6][1]
+      },
+        error => this.errorMsg = error);
 
-    this.contractModel = new Contract(this.professorId,null,null,null,null);
+    this.contractModel = new Contract(this.professorId, this.selectedAcadYear, null, null, null, null, null);
   }
 
-  onDelete(id){
-
-  }
-
-
-  onSelected(id,edit = null){
-
-    if(edit){
-      this.contractId = id;
-      this._contractService.getContractById(id)
-      .subscribe(data => this.contractModel = new Contract(data['prof_id'],data['title'],data['description'],data['startsAt'],data['endsAt']),
-          error => this.errorMsg = error);
-
-          this.formState = 'editContract';
-    }else{
-      this._contractService.getContractById(id)
-      .subscribe(data => this.currentContract = data,
-          error => this.errorMsg = error);
-
-          this.formState = 'newContract';
-
-    }
+  onDelete(id) {
 
   }
 
-  selectedTab(tab){
-    console.log(tab)
-    if(tab == 'details'){
-      this.new_contract_tab = null;
-      this.details_tab = true;
-    }else{
+  onSelectAcademyYear(event) {
+    this.selectedAcadYear = event.target.value;
+    this.selectedAcadYearName = event.target.textContent;
+  }
+
+  resetForm(form: NgForm) {
+    form.reset();
+    this.contractModel = new Contract(this.professorId, this.selectedAcadYear, null, null, null, null, null);
+    this.formState = 'newContract'
+  }
+
+
+  onSelected(id, edit = null) {
+
+
+
+    if (edit) {
+
       this.new_contract_tab = true;
       this.details_tab = null;
-    }
-  }
 
-  onDateSelection(date: NgbDate) {
-    if (!this.fromDate && !this.toDate) {
-      this.fromDate = date;
-    } else if (this.fromDate && !this.toDate && date && date.after(this.fromDate)) {
-      this.toDate = date;
+      this.contractId = id;
+      this._contractService.getContractById(id)
+        .subscribe(data => this.contractModel = new Contract(data['prof_id'], data['sem_id'], data['title'], data['description'], data['starts_at'], data['ends_at'], data['path']),
+          error => this.errorMsg = error);
+
+      console.log('on load', this.contractModel)
+
+      this.contractModel.starts_at = new Date(this.contractModel.starts_at)
+      this.contractModel.ends_at = new Date(this.contractModel.ends_at)
+
+      this.formState = 'editContract';
+
+      console.log('edit contract')
+      console.log('loaded data:', this.contractModel)
+
+
     } else {
-      this.toDate = null;
-      this.fromDate = date;
+      this.new_contract_tab = null;
+      this.details_tab = true;
+
+      this._contractService.getContractById(id)
+        .subscribe(data => this.currentContract = data,
+          error => this.errorMsg = error);
+
+      this.formState = 'newContract';
+    }
+
+  }
+
+  selectedTab(tab) {
+    if (tab == 'details') {
+      this.new_contract_tab = null;
+      this.details_tab = true;
+    } else {
+      this.new_contract_tab = true;
+      this.details_tab = null;
+
+      // Load last contract
+      let lastContract = this.contract_list[this.contract_list.length - 1];
+      console.log(lastContract)
+
+      this.contractModel = new Contract(this.professorId, this.selectedAcadYear, lastContract.title, lastContract.description, lastContract.starts_at.split(' ')[0], lastContract.ends_at.split(' ')[0], null);
     }
   }
 
-  isHovered(date: NgbDate) {
-    return this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
-  }
-
-  isInside(date: NgbDate) {
-    return this.toDate && date.after(this.fromDate) && date.before(this.toDate);
-  }
-
-  isRange(date: NgbDate) {
-    return date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
-  }
-
-  validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
-    const parsed = this.formatter.parse(input);
-    return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue;
-  }
-
-
-   //find and update contract list from response
-   updateContractList(data) {
+  //find and update contract list from response
+  updateContractList(data) {
     this.contract_list.forEach(function (value) {
-      if(data['id'] == value.id){
+      if (data['id'] == value.id) {
         value.title = data['title'];
         value.description = data['description'];
-        value.startsAt = data['startsAt'];
-        value.endsAt = data['endsAt'];
+        value.status = data['status'];
+        value.starts_at = new Date(data['starts_at']);
+        value.ends_at = new Date(data['ends_at']);
+        value.path = data['path'];
       }
     });
   }
 
+  download(contract) {
+    var filename = contract.path
+    filename = filename.substring(filename.lastIndexOf('/') + 1);
+    this._contractService.downloadFile(contract)
+      .subscribe((response: any) => {
+        var data = new Blob([response], { type: 'text/plain;charset=utf-8' });
+        fileSaver.saveAs(data, filename);
+      }), (error: any) => console.log('Error downloading the file'), //when you use stricter type checking
+      () => console.info('File downloaded successfully');
+  }
 
-  onSubmit() {
-    console.log(this.contractModel)
-    if(this.formState == 'newContract'){
+  onFileSelected(event) {
+
+    const file: File = event.target.files[0];
+
+    if (file) {
+
+      this.fileName = file.name;
+
+      const formData = new FormData();
+
+      formData.append("fileImage", file);
+      console.log(formData)
+      this.contractModel.path = formData;
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        return this.contractModel.path = reader.result;
+      };
+
+      reader.readAsDataURL(file);
+
+    }
+  }
+
+
+  onSubmit(form: NgForm) {
+
+    if (this.formState == 'newContract') {
+
+      this.contractModel.sem_id = this.selectedAcadYear
+      console.log(this.contractModel)
       this._contractService.createContract(this.contractModel)
         .subscribe(
           data => this.contract_list.push(data),
           error => console.log('Error!', error)
         )
-    }else if(this.formState == 'editContract'){
-      this._contractService.editContract(this.contractModel,this.contractId)
+
+
+    } else if (this.formState == 'editContract') {
+      this.contractModel.starts_at = new Date(this.contractModel.starts_at)
+      this.contractModel.ends_at = new Date(this.contractModel.ends_at)
+      this._contractService.editContract(this.contractModel, this.contractId)
         .subscribe(
           data => this.updateContractList(data),
           error => console.log('Error!', error)
         )
 
-        console.log('response data',this.editResponse)
     }
+    form.resetForm();
+    this.contractModel = new Contract(this.professorId, this.selectedAcadYear, null, null, null, null, null);
+    this.formState = 'newContract'
+    this.new_contract_tab = null;
+    this.details_tab = true;
+
 
 
   }
