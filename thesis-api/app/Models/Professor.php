@@ -10,12 +10,14 @@ use App\Models\AcademyYear;
 use App\Models\Course;
 use App\Models\Assignment;
 use App\Models\Contract;
+use App\Models\Permit;
 
 class Professor extends Model
 {
     use HasFactory;
 
     protected $table = 'prof';
+    protected $fillable = ['is_monimos','updated_at'];
 
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
@@ -40,7 +42,7 @@ class Professor extends Model
             'sem_id',
             'prof_id',
             'sem_id'
-        );
+        )->select();
     }
 
     public function academy()
@@ -66,5 +68,11 @@ class Professor extends Model
     {
         return $this->hasMany(Contract::class, 'prof_id', 'prof_id');
     }
+
+    public function permits()
+    {
+        return $this->hasMany(Permit::class, 'prof_id', 'prof_id');
+    }
+
 
 }

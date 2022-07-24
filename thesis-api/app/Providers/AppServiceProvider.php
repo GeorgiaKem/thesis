@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Laravel\Socialite\Contracts\Factory;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +25,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $socialite = $this->app->make(Factory::class);
+
+        $socialite->extend('IeeProvider', function () use ($socialite) {
+            $config = config('services.iee');
+
+            return $socialite->buildProvider(SocialitePlusServiceProvider::class, $config);
+        });
     }
 }
