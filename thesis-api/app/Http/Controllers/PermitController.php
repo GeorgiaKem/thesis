@@ -40,6 +40,7 @@ class PermitController extends Controller
             $permit = new Permit;
             $permit->prof_id = $request->prof_id;
             $permit->title = $request->title;
+            $permit->sem_id = $request->sem_id;
 
             if(isset($request->description)){
                 $permit->description = $request->description;

@@ -17,6 +17,7 @@ class Professor extends Model
     use HasFactory;
 
     protected $table = 'prof';
+    protected $fillable = ['is_monimos','updated_at'];
 
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
@@ -41,7 +42,7 @@ class Professor extends Model
             'sem_id',
             'prof_id',
             'sem_id'
-        );
+        )->select();
     }
 
     public function academy()
@@ -72,5 +73,6 @@ class Professor extends Model
     {
         return $this->hasMany(Permit::class, 'prof_id', 'prof_id');
     }
+
 
 }

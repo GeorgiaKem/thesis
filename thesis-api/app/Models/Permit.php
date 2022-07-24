@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Permit;
+use App\Models\Semester;
 
 class Permit extends Model
 {
@@ -17,5 +18,10 @@ class Permit extends Model
     public function professors()
     {
         return $this->belongsTo(Permit::class, 'prof_id', 'prof_id');
+    }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'sem_id', 'sem_id');
     }
 }

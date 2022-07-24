@@ -19,5 +19,5 @@ Route::get('/', function () {
 });
 
 Route::get('sign-in', [PassportAuthController::class, 'signIn'])->name('login');
-Route::get('/sign-in/redirect', [PassportAuthController::class, 'redirect']);
+Route::get('sign-in/redirect', [PassportAuthController::class, 'redirect'])->name('redirect');
 

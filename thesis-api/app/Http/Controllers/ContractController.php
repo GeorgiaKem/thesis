@@ -39,6 +39,7 @@ class ContractController extends Controller
         if(isset($request->prof_id)){
             $contracts = new Contract;
             $contracts->prof_id = $request->prof_id;
+            $contracts->sem_id = $request->sem_id;
             $contracts->title = (isset($request->title) ? $request->title : null);
             $contracts->description = (isset($request->description) ? $request->description : null);
             $contracts->status = (isset($request->status) ? $request->status : false);

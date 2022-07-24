@@ -18,7 +18,7 @@ return [
         'client_id' => env('CLIENT_ID'),
         'redirect' => env('REDIRECT_URI'),
         'response_type' => env('RESPONSE_TYPE'),
-        'client_secret' => env('CLIENT_SECRET')
+        'client_secret' => env('CLIENT_SECRET'),
     ],
 
     'mailgun' => [
