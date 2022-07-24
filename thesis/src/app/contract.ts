@@ -3,8 +3,7 @@ export class Contract {
     public prof_id: number,
     public title: string,
     public description: string,
-    public starts_at: string,
-    public ends_at: string,
-    public path: File
-  ) { }
+    public startsAt: string,
+    public endsAt: string
+  ){}
 }
