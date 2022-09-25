@@ -5,7 +5,7 @@
   <div class="row">
     <div class="col-12 text-right">
       <div ngbDropdown class="d-inline-block">
-        <button class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle><ng-container *ngIf="selectedAcadYear == null">Ακαδημαικό έτος</ng-container><ng-container *ngIf="selectedAcadYear != null">{{selectedAcadYearName}}</ng-container></button>
+        <button class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle><ng-container *ngIf="selectedAcadYear == null">Ακαδημαϊκό έτος</ng-container><ng-container *ngIf="selectedAcadYear != null">{{selectedAcadYearName}}</ng-container></button>
         <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
           
           <button ngbDropdownItem *ngFor="let sem of semester_list" (click)="onSelectAcademyYear($event)" [value]=sem.sem_id>{{sem.semester}}</button>
@@ -23,20 +23,20 @@
           <th scope="col">Κατάσταση</th>
           <th scope="col">Από</th>
           <th scope="col">Μέχρι</th>
-          <th scope="col">Actions</th>
+          <th scope="col">Ενέργειες</th>
         </tr>
         </thead>
         <tbody>
         <tr *ngFor="let contract of contract_list;">
           <ng-container *ngIf="selectedAcadYear == contract.sem_id">
           <td scope="row">{{contract.title}}</td>
-          <td scope="row">{{contract.status == 0 ? 'Ανένεργη' : 'Ενεργή'}}</td>
+          <td scope="row">{{contract.status == 0 ? 'Ανενεργή' : 'Ενεργή'}}</td>
           <td scope="row">{{contract.starts_at | date: 'dd/MM/yyyy'}}</td>
           <td scope="row">{{contract.ends_at | date: 'dd/MM/yyyy'}}</td>
           <td style="display:inline-block;">
-            <button style="margin-right: 5px;" (click)="onSelected(contract.id)" type="button" class="btn btn-secondary btn-sm">Προβολή</button>
-            <button style="margin-right: 5px;" (click)="onSelected(contract.id,true)" type="button" class="btn btn-warning btn-sm">Επεξεργασία</button>
-            <!-- <button (click)="onDelete(contract.id)" type="button" class="btn btn-danger btn-sm">Delete</button> -->
+            <button style="margin-right: 5px;" (click)="onSelected(contract.id)" type="button" class="btn btn-secondary btn-sm" style="width:100px">Προβολή</button>
+            <button style="margin-right: 5px;" (click)="onSelected(contract.id,true)" type="button" class="btn btn-warning btn-sm"style="width:100px">Επεξεργασία</button>
+            <button style="margin-right: 5px;" (click)="destroy(contract.id)" type="button" class="btn btn-danger btn-sm" style="width:100px">Διαγραφή</button>
           </td>
         </ng-container>
 
@@ -47,7 +47,7 @@
     <div class="col-md-6">
       <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-          <a class="nav-link" [class.active]="details_tab" (click)="selectedTab('details')" id="home-tab" data-toggle="tab" href="javascript:void(0);" role="tab" aria-controls="home" aria-selected="true">Λεπτομέρειες</a>
+          <a class="nav-link" [class.active]="details_tab" (click)="selectedTab('details')" id="home-tab" data-toggle="tab" href="javascript:void(0);" role="tab" aria-controls="home" aria-selected="true" >Λεπτομέρειες</a>
         </li>
         <li class="nav-item" role="presentation">
           <a class="nav-link" [class.active]="new_contract_tab" (click)="selectedTab('new_contract')" id="profile-tab" data-toggle="tab" href="javascript:void(0);" role="tab" aria-controls="profile" aria-selected="false">{{ formState}}</a>
@@ -56,25 +56,32 @@
       <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show" [class.active]="details_tab" id="home" role="tabpanel" aria-labelledby="home-tab">
           <div class="text-center">
+            <div *ngIf="!noContracts; else elseBlock1"></div>
             <h4>Τίτλος:</h4>
             <p *ngIf="currentContract != null">{{currentContract.title}}</p>
 
             <h4>Αρχείο:</h4>
-            <button *ngIf="currentContract != null && currentContract.path != ''; else noFile" class="btn btn-primary" (click)="download(currentContract)">Download</button>
+            <button *ngIf="currentContract != null && currentContract.path != ''; else noFile" class="btn btn-primary" (click)="download(currentContract)">Λήψη</button>
             <ng-template #noFile>
               <p>Χωρίς αρχείο</p>
             </ng-template>
             <!-- <p *ngIf="currentContract != null">{{currentContract.path}}</p> -->
             <h4>Κατάσταση:</h4>
-            <p *ngIf="currentContract != null">{{currentContract.status == 1 ? 'Ενεργή' : 'Ανένεργη'}}</p>
+            <p *ngIf="currentContract != null">{{currentContract.status == 1 ? 'Ενεργή' : 'Ανενεργή'}}</p>
 
             <h4>Από:</h4>
             <p *ngIf="currentContract != null">{{currentContract.starts_at | date: 'dd/MM/yyyy'}}</p>
 
             <h4>Μέχρι:</h4>
             <p *ngIf="currentContract != null">{{currentContract.ends_at | date: 'dd/MM/yyyy'}}</p>
-
           </div>
+          <ng-template #elseBlock1>
+           
+              <h3 class="text-center">Δεν υπάρχουν αναθέσεις γι' αυτό το εξάμηνο</h3>
+            
+          </ng-template>
+
+          
         </div>
         <div class="tab-pane fade show" [class.active]="new_contract_tab" id="profile" role="tabpanel" aria-labelledby="profile-tab">
           <form #contractForm="ngForm" (ngSubmit)="onSubmit(contractForm);" novalidate>

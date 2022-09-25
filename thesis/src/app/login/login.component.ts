@@ -20,8 +20,10 @@ export class LoginComponent implements OnInit {
     this.route.queryParams
       .subscribe(params => {
         localStorage.setItem('access_token', JSON.parse(params.access_token).original.token);
-        console.log(JSON.parse(params.access_token).original.token); // { orderby: "price" }
-
+        
+        if (JSON.parse(params.access_token).original.token) {
+          window.location.href = '/professors';
+        }
       }
       );
   }

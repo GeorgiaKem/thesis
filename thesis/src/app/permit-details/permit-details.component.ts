@@ -28,10 +28,40 @@ export class PermitDetailsComponent implements OnInit {
   public semester_list = null;
   public selectedAcadYear = null;
   public selectedAcadYearName = null;
+  public showDetails = false;
+  public noPermits = false;
 
 
   constructor(private _permitService: PermitService, private route: ActivatedRoute, private _professorsService: ProfessorsService) { }
 
+
+  fetchData() {
+    this._professorsService.getProfessorById(this.professorId)
+      .subscribe(data => {
+        this.permit_list = Object.entries(data)[15][1]
+        let found = false;
+        console.log('selected acad year', this.selectedAcadYear)
+        this.permit_list.forEach(element => {
+          console.log(element)
+          if (element.sem_id == this.selectedAcadYear) {
+            found = true;
+          }
+        });
+
+        if (found) {
+
+          console.log('has found')
+          this.showDetails = true;
+        } else {
+          console.log('has NO found')
+
+          this.showDetails = false;
+        }
+      },
+        error => this.errorMsg = error);
+
+
+  }
   ngOnInit(): void {
     this.route.paramMap.subscribe((params: ParamMap) => {
       let id = parseInt(params.get('id'));
@@ -41,11 +71,7 @@ export class PermitDetailsComponent implements OnInit {
 
     this.permitModel = new Permit(this.professorId, null, null, null, null, null);
 
-    this._professorsService.getProfessorById(this.professorId)
-      .subscribe(data => this.permit_list = Object.entries(data)[15][1],
-        error => this.errorMsg = error);
 
-    console.log(this.permit_list)
 
 
     this._permitService.getSemesterList()
@@ -54,6 +80,8 @@ export class PermitDetailsComponent implements OnInit {
         if (this.semester_list.length != 0) {
           this.selectedAcadYear = this.semester_list[this.semester_list.length - 1].sem_id;
           this.selectedAcadYearName = this.semester_list[this.semester_list.length - 1].semester;
+
+          this.fetchData()
         }
       })
 
@@ -64,6 +92,22 @@ export class PermitDetailsComponent implements OnInit {
     this.selectedAcadYear = event.target.value;
     this.selectedAcadYearName = event.target.textContent;
     console.log(this.selectedAcadYear)
+
+    let found = false;
+
+    this.permit_list.forEach(element => {
+      console.log(element.sem_id)
+      if (event.target.value == element.sem_id) {
+        found = true;
+      }
+    });
+
+    if (!found) {
+      console.log('without permit')
+      this.showDetails = false;
+    } else {
+      this.showDetails = true;
+    }
   }
 
   onSelected(permit, edit = null) {
@@ -79,6 +123,8 @@ export class PermitDetailsComponent implements OnInit {
       this.permitModel.until = (permit.until != null) ? new Date(permit.until) : null;
 
     } else {
+
+      this.showDetails = true
 
       this.new_permit_tab = null;
       this.details_tab = true;
@@ -128,6 +174,7 @@ export class PermitDetailsComponent implements OnInit {
           error => console.log('Error!', error)
         )
 
+      this.showDetails = true;
 
     } else if (this.formState == 'editPermit') {
       console.log('ON EDIT')
@@ -151,6 +198,25 @@ export class PermitDetailsComponent implements OnInit {
 
 
 
+  }
+
+  onDestroy(id) {
+    console.log(id)
+
+    var self = this
+
+    this._permitService.delete(id).subscribe(data => {
+
+    }, error => this.errorMsg = error);
+
+    this.permit_list.forEach(function (value, index) {
+
+      if (id == value.id) {
+
+        delete self.permit_list[index];
+
+      }
+    });
   }
 
   selectedTab(tab) {

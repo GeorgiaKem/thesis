@@ -33,14 +33,49 @@ export class PermitService {
     return this.http.get<any>(_url1, { headers: httpHeaders });
   }
 
+  delete(id) {
+    let token = localStorage.getItem('access_token');
+    let httpHeaders = new HttpHeaders({
+      'Access-Control-Allow-Origin': 'http://localhost:4200',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Cache-Control': 'no-cache',
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+
+    });
+
+    let _url2 = 'http://thesis-api.test/api/permit/delete/' + id;
+    return this.http.delete<any>(_url2, { headers: httpHeaders });
+  }
+
   createPermit(permit: Permit) {
+    let token = localStorage.getItem('access_token');
+    let httpHeaders = new HttpHeaders({
+      'Access-Control-Allow-Origin': 'http://localhost:4200',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Cache-Control': 'no-cache',
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+
+    });
+
     let _url1 = 'http://thesis-api.test/api/permit/create';
-    return this.http.post<any>(_url1, permit);
+    return this.http.post<any>(_url1, permit, { headers: httpHeaders });
   }
 
   editPermit(permit: Permit, id) {
+    let token = localStorage.getItem('access_token');
+    let httpHeaders = new HttpHeaders({
+      'Access-Control-Allow-Origin': 'http://localhost:4200',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Cache-Control': 'no-cache',
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+
+    });
+
     let _url2 = 'http://thesis-api.test/api/permit/update/' + id;
-    return this.http.post<any>(_url2, permit);
+    return this.http.post<any>(_url2, permit, { headers: httpHeaders });
   }
 
   errorHandler(error: HttpErrorResponse) {

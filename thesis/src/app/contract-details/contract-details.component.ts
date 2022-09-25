@@ -58,9 +58,39 @@ export class ContractDetailsComponent implements OnInit {
   public selectedAcadYearName = null;
   public profType = null;
 
+  public showDetails = false;
+  public noContracts = true;
+
 
 
   constructor(private _contractService: ContractService, private _professorsService: ProfessorsService, private route: ActivatedRoute) {
+  }
+  fetchDataByProf() {
+    this._professorsService.getProfessorById(this.professorId)
+      .subscribe(data => {
+        this.contract_list = Object.entries(data)[14][1]
+        console.log(Object.entries(data))
+        this.profType = Object.entries(data)[6][1]
+
+        let found = false;
+        console.log('selected acad year', this.selectedAcadYear)
+        this.contract_list.forEach(element => {
+          if (element.sem_id == this.selectedAcadYear) {
+            found = true;
+          }
+        });
+
+        if (found) {
+
+          console.log('has found')
+          this.noContracts = false;
+        } else {
+          console.log('has NO found')
+
+          this.noContracts = true;
+        }
+      },
+        error => this.errorMsg = error);
   }
 
   ngOnInit(): void {
@@ -77,19 +107,24 @@ export class ContractDetailsComponent implements OnInit {
         if (this.semester_list.length != 0) {
           this.selectedAcadYear = this.semester_list[this.semester_list.length - 1].sem_id;
           this.selectedAcadYearName = this.semester_list[this.semester_list.length - 1].semester;
+
+          console.log('new selected', this.selectedAcadYear)
+          this.fetchDataByProf()
         }
       })
 
 
-    this._professorsService.getProfessorById(this.professorId)
-      .subscribe(data => {
-        this.contract_list = Object.entries(data)[14][1]
-        console.log(Object.entries(data))
-        this.profType = Object.entries(data)[6][1]
-      },
-        error => this.errorMsg = error);
+
+
+
+
+
 
     this.contractModel = new Contract(this.professorId, this.selectedAcadYear, null, null, null, null, null);
+
+
+
+
   }
 
   onDelete(id) {
@@ -99,6 +134,28 @@ export class ContractDetailsComponent implements OnInit {
   onSelectAcademyYear(event) {
     this.selectedAcadYear = event.target.value;
     this.selectedAcadYearName = event.target.textContent;
+
+    console.log('trig')
+    console.log('sem', event.target.value)
+
+
+    this.showDetails = true;
+
+    let found = false;
+
+    this.contract_list.forEach(element => {
+      console.log(element.sem_id)
+      if (event.target.value == element.sem_id) {
+        found = true;
+      }
+    });
+
+    if (!found) {
+      console.log('without contract')
+      this.noContracts = true;
+    } else {
+      this.noContracts = false;
+    }
   }
 
   resetForm(form: NgForm) {
@@ -111,7 +168,7 @@ export class ContractDetailsComponent implements OnInit {
   onSelected(id, edit = null) {
 
 
-
+    this.showDetails = true;
     if (edit) {
 
       this.new_contract_tab = true;
@@ -224,6 +281,7 @@ export class ContractDetailsComponent implements OnInit {
           error => console.log('Error!', error)
         )
 
+      this.noContracts = false;
 
     } else if (this.formState == 'editContract') {
       this.contractModel.starts_at = new Date(this.contractModel.starts_at)
@@ -243,6 +301,24 @@ export class ContractDetailsComponent implements OnInit {
 
 
 
+
+  }
+  destroy(id) {
+
+    var self = this
+
+    this._contractService.delete(id).subscribe(data => {
+
+    }, error => this.errorMsg = error);
+
+    this.contract_list.forEach(function (value, index) {
+
+      if (id == value.id) {
+
+        delete self.contract_list[index];
+
+      }
+    });
   }
 
 

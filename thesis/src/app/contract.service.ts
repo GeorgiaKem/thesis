@@ -30,8 +30,19 @@ export class ContractService {
   }
 
   createContract(contract: Contract) {
+    let token = localStorage.getItem('access_token');
+
+    let httpHeaders = new HttpHeaders({
+      'Access-Control-Allow-Origin': 'http://localhost:4200',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Cache-Control': 'no-cache',
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+
+    });
+
     let _url1 = 'http://thesis-api.test/api/contract/create';
-    return this.http.post<any>(_url1, contract);
+    return this.http.post<any>(_url1, contract, { headers: httpHeaders });
   }
 
   getSemesterList() {
@@ -51,8 +62,34 @@ export class ContractService {
   }
 
   editContract(contract: Contract, id) {
+    let token = localStorage.getItem('access_token');
+
+    let httpHeaders = new HttpHeaders({
+      'Access-Control-Allow-Origin': 'http://localhost:4200',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Cache-Control': 'no-cache',
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+
+    });
+
     let _url2 = 'http://thesis-api.test/api/contract/update/' + id;
-    return this.http.post<any>(_url2, contract);
+    return this.http.post<any>(_url2, contract, { headers: httpHeaders });
+  }
+  delete(id) {
+    let token = localStorage.getItem('access_token');
+
+    let httpHeaders = new HttpHeaders({
+      'Access-Control-Allow-Origin': 'http://localhost:4200',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Cache-Control': 'no-cache',
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+
+    });
+
+    let _url2 = 'http://thesis-api.test/api/contract/delete/' + id;
+    return this.http.delete<any>(_url2, { headers: httpHeaders });
   }
 
   downloadFile(contract: Contract) {

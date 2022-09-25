@@ -20,9 +20,16 @@ export class ProfessorsService {
 
     let token = localStorage.getItem('access_token');
 
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    let httpHeaders = new HttpHeaders({
+      'Access-Control-Allow-Origin': 'http://localhost:4200',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Cache-Control': 'no-cache',
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
 
-    return this.http.get<IProfessor[]>(this._url, { headers: headers })
+    });
+
+    return this.http.get<IProfessor[]>(this._url, { headers: httpHeaders })
       .pipe(catchError(this.errorHandler));
 
   }

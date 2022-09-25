@@ -17,7 +17,6 @@ export class GuestGuardService {
     if (!localStorage.getItem('access_token')) {
       return true;
     }
-    console.log('test45')
     this.router.navigate(['/professors']);
     return false;
   }
