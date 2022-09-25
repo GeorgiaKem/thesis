@@ -23,14 +23,14 @@
           <th scope="col">Κατάσταση</th>
           <th scope="col">Από</th>
           <th scope="col">Μέχρι</th>
-          <th scope="col">Actions</th>
+          <th scope="col">Ενέργειες</th>
         </tr>
         </thead>
         <tbody>
         <tr *ngFor="let contract of contract_list;">
           <ng-container *ngIf="selectedAcadYear == contract.sem_id">
           <td scope="row">{{contract.title}}</td>
-          <td scope="row">{{contract.status == 0 ? 'Ανένεργη' : 'Ενεργή'}}</td>
+          <td scope="row">{{contract.status == 0 ? 'Ανενεργή' : 'Ενεργή'}}</td>
           <td scope="row">{{contract.starts_at | date: 'dd/MM/yyyy'}}</td>
           <td scope="row">{{contract.ends_at | date: 'dd/MM/yyyy'}}</td>
           <td style="display:inline-block;">
@@ -62,7 +62,7 @@
               <p *ngIf="currentContract != null">{{currentContract.title}}</p>
 
               <h4>Αρχείο:</h4>
-              <button *ngIf="currentContract != null && currentContract.path != ''; else noFile" class="btn btn-primary" (click)="download(currentContract)">Download</button>
+              <button  *ngIf="currentContract != null && currentContract.path != ''; else noFile" class="btn btn-primary" (click)="download(currentContract)">Λήψη</button>
               <ng-template #noFile>
                 <p>Χωρίς αρχείο</p>
               </ng-template>
@@ -106,7 +106,7 @@
                 <input matStartDate name="from" placeholder="Start date" [(ngModel)]="contractModel.starts_at">
                 <input matEndDate name="until" placeholder="End date" [(ngModel)]="contractModel.ends_at">
               </mat-date-range-input>
-              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker-toggle matSuffix [for]="picker" ></mat-datepicker-toggle>
               <mat-date-range-picker #picker></mat-date-range-picker>
             </mat-form-field>
             <!-- <ngb-datepicker #dp (dateSelect)="onDateSelection($event)" [displayMonths]="2" [dayTemplate]="t" outsideDays="hidden">
@@ -127,9 +127,9 @@
 <pre>To: {{ ends_at | json }} </pre> -->
 
             <div class="row">
-              <div class="col-8">
+              <div class="col-20" style="margin-left: 15px!important;">
                 <label class="btn btn-default p-0">
-                  <input class="form-control" accept="image/*" type="file" (change)="onFileSelected($event)" #fileUpload/>
+                  <input class="form-control-file" accept="image/*" type="file" (change)="onFileSelected($event)" #fileUpload/>
                 </label>
               </div>
 
