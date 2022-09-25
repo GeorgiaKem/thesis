@@ -104,11 +104,18 @@ class PermitController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Model\Permit  $permit
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Permit $permit)
+    public function destroy($id)
     {
-        //
+        $permit = Permit::findOrFail($id);
+
+        if($permit) 
+            $permit->delete(); 
+        else
+            return response()->json(error);
+        
+        return response()->json(null); 
     }
 }
