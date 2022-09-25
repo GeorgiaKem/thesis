@@ -102,7 +102,6 @@ export class ProfessorsComponent implements OnInit {
         // this.selectedAcadYearName = this.sem_list[this.sem_list.length - 1].sem;
 
         res.forEach(elem => {
-          console.log(elem.is_monimos == 0)
 
           let sems = elem.semesters
           sems.forEach(elem1 => {

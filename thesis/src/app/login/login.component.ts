@@ -20,14 +20,16 @@ export class LoginComponent implements OnInit {
     this.route.queryParams
       .subscribe(params => {
         localStorage.setItem('access_token', JSON.parse(params.access_token).original.token);
-        console.log(JSON.parse(params.access_token).original.token); // { orderby: "price" }
+
+        if (JSON.parse(params.access_token).original.token) {
+          window.location.href = '/professors';
+        }
 
       }
       );
   }
 
   login(): void {
-    console.log('btn')
     window.location.href = 'http://thesis-api.test/sign-in';
     //this.router.navigate(['/login']);
     this.authService.login('asd@asd.com', 'asd')

@@ -28,6 +28,7 @@
       <h5>Όνομα Καθηγητή</h5>
       <p>{{ prof_name}}</p>
       <h5>Τύπος Καθηγητή:</h5>
+      <p>Αλλαγή κατάστασης καθηγητή:</p>
 
       <mat-button-toggle-group #grou="matButtonToggleGroup" 
 
@@ -64,37 +65,52 @@
     </div>
 
   </div>
+  <hr>
   <div class="row">
 
-    <div class="col-6">
-      <h3 class="text-center">Μαθήματα</h3>
-      <table class="table table-striped">
-        <thead>
-        <tr>
-          <th scope="col">Id</th>
-          <th scope="col">Κατάσταση</th>
-          <th scope="col">Όνομα</th>
-          <th scope="col">Εξάμηνο</th>
-          <th scope="col">Τύπος Μαθήματος</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let course of courses_list;">
-          <ng-container *ngIf="selectedAcadYear != null" >
-            <ng-container *ngIf="course.sem_id == selectedAcadYear">
-              <th>{{course.course_id}}</th>
-              <th scope="row">{{course.is_active ? 'Ενεργό' : 'Ανένεργο'}}</th>
-              <td (click)="onSelectedCourse(course)">{{ course.desc }}</td>
-              <td>{{ course.examino }}</td>
-              <td>{{ course.course_type }}</td>
+    <div *ngIf="(showCourseTable); else elseBlock" class="col-6">
+      <div *ngIf="hasCourseThisAcademicYear; else elseBlock1">
+        <h3 class="text-center">Μαθήματα</h3>
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Κατάσταση</th>
+            <th scope="col">Όνομα</th>
+            <th scope="col">Εξάμηνο</th>
+            <th scope="col">Τύπος Μαθήματος</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let course of courses_list;">
+            <ng-container *ngIf="(selectedAcadYear != null)" >
+              <ng-container *ngIf="course.sem_id == selectedAcadYear">
+                <th>{{course.course_id}}</th>
+                <th scope="row">{{course.is_active ? 'Ενεργό' : 'Ανένεργο'}}</th>
+                <td (click)="onSelectedCourse(course)">{{ course.desc }}</td>
+                <td>{{ course.examino }}</td>
+                <td>{{ course.course_type }}</td>
+              </ng-container>
             </ng-container>
-          </ng-container>
-
-        </tr>
-        </tbody>
-      </table>
+  
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #elseBlock1>
+        <div class="col-12">
+          <h3 class="text-center">Δεν υπάρχουν μαθήματα γι' αυτό το εξάμηνο</h3>
+        </div>
+      </ng-template>
+      
     </div>
-    <div class="col-6">
+    <ng-template #elseBlock>
+      <div class="col-12">
+        <h3 class="text-center">Παρακαλώ επιλέξτε εξάμηνο</h3>
+      </div>
+    </ng-template>
+
+    <div *ngIf="showDetails" class="col-6">
       <h3 class="text-center">Λεπτομέρειες</h3>
       <hr>
       <div class="text-center">

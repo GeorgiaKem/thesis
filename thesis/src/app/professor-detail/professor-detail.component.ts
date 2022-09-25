@@ -26,6 +26,10 @@ export class ProfessorDetailComponent implements OnInit {
   public is_monimos1 = true;
   public prof_name = null;
 
+  public showDetails = false;
+  public showCourseTable = false;
+  public hasCourseThisAcademicYear = false;
+
   constructor(private route: ActivatedRoute, private _professorsService: ProfessorsService, private router: Router) { }
 
   ngOnInit(): void {
@@ -69,7 +73,6 @@ export class ProfessorDetailComponent implements OnInit {
     } else {
       state = true;
     }
-    console.log(state)
     this._professorsService.editType(this.professorId, state)
       .subscribe(
         error => this.errorMsg = error
@@ -78,8 +81,19 @@ export class ProfessorDetailComponent implements OnInit {
   }
 
   onSelectAcademyYear(event) {
+    this.showDetails = false;
     this.selectedAcadYear = event.target.value;
     this.selectedAcadYearName = event.target.textContent;
+    this.showCourseTable = true;
+
+    this.hasCourseThisAcademicYear = false;
+    this.courses_list.forEach(element => {
+
+      if (this.selectedAcadYear == element.sem_id) {
+        this.hasCourseThisAcademicYear = true;
+      }
+
+    });
   }
 
   goPrevious() {
@@ -93,10 +107,11 @@ export class ProfessorDetailComponent implements OnInit {
   }
 
   onSelectedCourse(course) {
-    console.log(course)
     this.selectedCourseTitle = course.desc;
     this.selectedCourseType = course.course_type;
     this.selectedCourseTeachHours = course.teach_hours
+
+    this.showDetails = true;
   }
 
   goToProfessors() {
