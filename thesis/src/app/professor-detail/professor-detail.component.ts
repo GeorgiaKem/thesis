@@ -73,7 +73,6 @@ export class ProfessorDetailComponent implements OnInit {
     } else {
       state = true;
     }
-    console.log(state)
     this._professorsService.editType(this.professorId, state)
       .subscribe(
         error => this.errorMsg = error

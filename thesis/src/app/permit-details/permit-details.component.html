@@ -1,14 +1,12 @@
 
 
 
-
-
 <div class="container">
   <div class="row">
     <div class="col-12 text-right">
       <div ngbDropdown class="d-inline-block">
         <button class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>
-          <ng-container *ngIf="selectedAcadYear == null">Ακαδημαϊκό έτος</ng-container>
+          <ng-container *ngIf="selectedAcadYear == null">Ακαδημαικό έτος</ng-container>
           <ng-container *ngIf="selectedAcadYear != null">{{selectedAcadYearName}}
 
           </ng-container>
@@ -20,8 +18,8 @@
       </div>
     </div>
   </div>
-    <div class="row" style="margin-right: 0px!important;">
-      <div class="col-md-6">
+    <div class="row">
+      <div class="col-md-8">
         <h3 class="text-center">Επιλέξτε Άδεια</h3>
         <table class="table table-striped">
           <thead>
@@ -30,20 +28,20 @@
             <th scope="col">Τίτλος</th>
             <th scope="col">Από</th>
             <th scope="col">Μέχρι</th>
-            <th scope="col">Ενέργειες</th>
+            <th scope="col">Actions</th>
           </tr>
           </thead>
           <tbody>
-          <tr *ngFor="let permit of permit_list;" >
-            <ng-container *ngIf="selectedAcadYear == permit.sem_id" >
+          <tr *ngFor="let permit of permit_list;">
+            <ng-container *ngIf="selectedAcadYear == permit.sem_id">
               <td scope="row">{{permit.id}}</td>
               <td scope="row">{{permit.title}}</td>
               <td scope="row">{{permit.from | date: 'dd/MM/yyyy'}}</td>
               <td scope="row">{{permit.until | date: 'dd/MM/yyyy'}}</td>
               <td style="display:inline-block;">
-              <button style="margin-right: 5px;" (click)="onSelected(permit)" type="button" class="btn btn-secondary btn-sm" style="width:110px">Προβολή</button>
-              <button style="margin-right: 5px;" (click)="onSelected(permit,true)" type="button" class="btn btn-warning btn-sm" style="width:110px">Επεξεργασία</button>
-              <button (click)="onDestroy(permit.id)" type="button" class="btn btn-danger btn-sm" style="width:110px">Διαγραφή</button>
+              <button style="margin-right: 5px;" (click)="onSelected(permit)" type="button" class="btn btn-secondary btn-sm">Προβολή</button>
+              <button style="margin-right: 5px;" (click)="onSelected(permit,true)" type="button" class="btn btn-warning btn-sm">Επεξεργασία</button>
+              <button (click)="onDestroy(permit.id)" type="button" class="btn btn-danger btn-sm">Διαγραφή</button>
             </td>
             </ng-container>
             
@@ -52,7 +50,7 @@
           </tbody>
         </table>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-4">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item" role="presentation">
             <a class="nav-link" [class.active]="details_tab" (click)="selectedTab('details')" id="home-tab" data-toggle="tab" href="javascript:void(0);" role="tab" aria-controls="home" aria-selected="true">Λεπτομέρειες</a>
@@ -79,8 +77,7 @@
             </div>
             <ng-template #elseBlock>
               <div class="col-12">
-                <br>
-                <h3 class="text-center" style="font-size: 15px;"> Δεν  υπάρχουν καταχωρημένες άδειες γι' αυτό το εξάμηνο.</h3>
+                <h3 class="text-center">Δεν υπάρχουν άδειες γι' αυτό το εξάμηνο</h3>
               </div>
             </ng-template>
           </div>

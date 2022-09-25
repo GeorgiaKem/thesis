@@ -40,20 +40,15 @@ export class PermitDetailsComponent implements OnInit {
       .subscribe(data => {
         this.permit_list = Object.entries(data)[15][1]
         let found = false;
-        console.log('selected acad year', this.selectedAcadYear)
         this.permit_list.forEach(element => {
-          console.log(element)
           if (element.sem_id == this.selectedAcadYear) {
             found = true;
           }
         });
 
         if (found) {
-
-          console.log('has found')
           this.showDetails = true;
         } else {
-          console.log('has NO found')
 
           this.showDetails = false;
         }
@@ -91,19 +86,16 @@ export class PermitDetailsComponent implements OnInit {
   onSelectAcademyYear(event) {
     this.selectedAcadYear = event.target.value;
     this.selectedAcadYearName = event.target.textContent;
-    console.log(this.selectedAcadYear)
 
     let found = false;
 
     this.permit_list.forEach(element => {
-      console.log(element.sem_id)
       if (event.target.value == element.sem_id) {
         found = true;
       }
     });
 
     if (!found) {
-      console.log('without permit')
       this.showDetails = false;
     } else {
       this.showDetails = true;
@@ -157,10 +149,25 @@ export class PermitDetailsComponent implements OnInit {
     });
   }
 
-  onSubmit(form: NgForm) {
-    console.log(this.permitModel)
+  onDestroy(id) {
 
-    console.log('Is Form Invalid', this.permitModel);
+    var self = this
+
+    this._permitService.delete(id).subscribe(data => {
+
+    }, error => this.errorMsg = error);
+
+    this.permit_list.forEach(function (value, index) {
+
+      if (id == value.id) {
+
+        delete self.permit_list[index];
+
+      }
+    });
+  }
+
+  onSubmit(form: NgForm) {
 
     if (this.formState == 'newPermit') {
       this.permitModel = new Permit(this.professorId, this.selectedAcadYear, this.permitModel.title, this.permitModel.description, this.permitModel.from, this.permitModel.until);
@@ -191,32 +198,12 @@ export class PermitDetailsComponent implements OnInit {
     }
     //form.resetForm();
     this.permitModel = new Permit(this.professorId, this.selectedAcadYear, null, null, null, null);
-    console.log(this.permitModel)
     this.formState = 'newPermit'
     this.new_permit_tab = null;
     this.details_tab = true;
 
 
 
-  }
-
-  onDestroy(id) {
-    console.log(id)
-
-    var self = this
-
-    this._permitService.delete(id).subscribe(data => {
-
-    }, error => this.errorMsg = error);
-
-    this.permit_list.forEach(function (value, index) {
-
-      if (id == value.id) {
-
-        delete self.permit_list[index];
-
-      }
-    });
   }
 
   selectedTab(tab) {

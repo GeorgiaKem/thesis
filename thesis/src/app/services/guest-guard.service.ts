@@ -17,7 +17,8 @@ export class GuestGuardService {
     if (!localStorage.getItem('access_token')) {
       return true;
     }
-    this.router.navigate(['/professors']);
+    //this.router.navigate(['/professors']);
+    this.router.navigateByUrl('/professors');
     return false;
   }
 }

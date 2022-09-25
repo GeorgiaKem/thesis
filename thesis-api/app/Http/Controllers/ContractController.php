@@ -43,7 +43,7 @@ class ContractController extends Controller
             $contracts->title = (isset($request->title) ? $request->title : null);
             $contracts->description = (isset($request->description) ? $request->description : null);
             $contracts->status = (isset($request->status) ? $request->status : false);
-            $contracts->path = (isset($request->path) ? $request->path : '');
+
             $contracts->starts_at = (isset($request->starts_at) ? date('Y-m-d',strtotime($request->starts_at)) : null);
             $contracts->ends_at = (isset($request->ends_at) ? date('Y-m-d',strtotime($request->ends_at)) : null);
 
@@ -58,6 +58,10 @@ class ContractController extends Controller
             }
 
             $contracts->save();
+
+            if($request->path){
+                $this->imgFunction($request, $contracts);
+            }
             return response()->json($contracts);
         }
         
@@ -99,11 +103,63 @@ class ContractController extends Controller
      * @return \Illuminate\Http\Response
      */
 
+
+    public function imgFunction($request, $contract){
+        $image = $request->path;  // your base64 encoded
+        if($image != null) {
+
+            if($contract->path != '')
+                Storage::delete($contract->path);
+
+            if(strlen($request->path) > 4){
+                
+                $extension = explode('/',explode(',',$image)[0]);
+                $extension = str_replace(';base64','',$extension[1]);
+            }else{
+                $extension = $request->path->getClientOriginalExtension();
+            }
+
+            $allowedfileExtension=['pdf','jpg','png', 'PNG'];
+
+            //$files = $request->file('fileName'); 
+            $errors = [];   
+        
+    
+            $check = in_array($extension,$allowedfileExtension);
+    
+            if($check) {
+
+                if(strlen($request->path) > 4){
+                    //$path = $request->fileName->store('public/contract');
+                    //$name = $request->fileName->getClientOriginalName();
+                    $image = str_replace(explode(',',$image)[0].',', '', $image);
+                    $image = str_replace(' ', '+', $image);
+                    $imageName = uniqid() . '.'. $extension;
+                    
+                    Storage::disk('contract')->put($imageName, base64_decode($image));
+                }else{
+                    $imageName = $image->store('public/contract');
+                }
+
+                
+                //Storage::disk('contract')->store($imageName);
+               
+                $contract->path = 'public/contract/'.$imageName;  
+                
+
+                $contract->update((array) $contract);
+            } else  {
+                return response()->json(['invalid_file_format'], 422);
+            }          
+        }
+    } 
     
     public function update(Request $request, $id)
     {
         $contract = Contract::find($id);
 
+        $contract->title = $request->title;
+        $contract->description = $request->description;
         $contract->starts_at = date('Y-m-d',strtotime($request->starts_at));
         $contract->ends_at = isset($request->ends_at) ? date('Y-m-d',strtotime($request->ends_at)) : null;
 
@@ -117,43 +173,15 @@ class ContractController extends Controller
         }else{
             $contract->status = 0;
         }
-        $image = $request->path;  // your base64 encoded
-
-        if($image != null) {
-
-            if($contract->path != '')
-                Storage::delete($contract->path);
-
-            $extension = explode('/',explode(',',$image)[0]);
-            $extension = str_replace(';base64','',$extension[1]);
-
-            $allowedfileExtension=['pdf','jpg','png', 'PNG'];
-
-            //$files = $request->file('fileName'); 
-            $errors = [];   
         
-    
-            $check = in_array($extension,$allowedfileExtension);
-    
-            if($check) {
-                // $path = $request->fileName->store('public/contract');
-                // $name = $request->fileName->getClientOriginalName();
-                $image = str_replace(explode(',',$image)[0].',', '', $image);
-                $image = str_replace(' ', '+', $image);
-                $imageName = uniqid() . '.png';
-                Storage::disk('contract')->put($imageName, base64_decode($image));
-                $contract->path = 'public/contract/'.$imageName;  
-                
 
-
-                $contract->update((array) $contract);
-            } else  {
-                return response()->json(['invalid_file_format'], 422);
-            }          
-        }
+        
+        $this->imgFunction($request, $contract);
+        
         //$input = $request->all()->except(['path', 'region_id']);
         unset($contract['path']);
         $contract->update((array) $contract);
+
 
         return response()->json($contract);
 
@@ -161,7 +189,8 @@ class ContractController extends Controller
 
     public function download(Request $request){
         $file = substr($request->all()['path'], strrpos($request->all()['path'], '/') + 1);
-        $path = storage_path('app/' . $request->all()['path']);
+
+        $path = storage_path('app/'.$request->all()['path']);
         return response()->download($path, $file);
     }
 
@@ -173,6 +202,13 @@ class ContractController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $contract = Contract::findOrFail($id);
+
+        if($contract) 
+            $contract->delete(); 
+        else
+            return response()->json(error);
+        
+        return response()->json(null); 
     }
 }

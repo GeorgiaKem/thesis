@@ -23,22 +23,6 @@ use App\Http\Controllers\SemesterController;
 Route::post('register', [PassportAuthController::class, 'register']);
 Route::post('login', [PassportAuthController::class, 'login']);
 
-
-Route::middleware('auth:api')->get('professors', [ProfessorController::class, 'index']);
-
-//Route::get('professors', [ProfessorController::class, 'index']);
-Route::get('professor/{id}', [ProfessorController::class, 'fetchById']);
-Route::middleware('auth:api')->post('professor/edit/{id}', [ProfessorController::class, 'editType']);
-Route::get('acad_list', [AcademyYearController::class, 'index']);
-Route::middleware('auth:api')->get('semester_list', [SemesterController::class, 'index']);
-Route::post('contract/create',[ContractController::class, 'store']);
-Route::middleware('auth:api')->get('contract/show/{id}',[ContractController::class, 'show']);
-Route::post('contract/update/{id}',[ContractController::class, 'update']);
-Route::post('contract/download',[ContractController::class, 'download']);
-
-Route::post('permit/create',[PermitController::class, 'store']);
-Route::post('permit/update/{id}',[PermitController::class, 'update']);
-
 Route::get('sign-in', [PassportAuthController::class, 'signIn'])->name('login');
 Route::get('/sign-in/redirect', 'Auth\AuthController@redirect');
 
@@ -46,6 +30,24 @@ Route::get('/sign-in/redirect', 'Auth\AuthController@redirect');
 
 Route::middleware('auth:api')->group(function () {
     Route::resource('posts', PostController::class);
-    
 
+    Route::get('professors', [ProfessorController::class, 'index']);
+    Route::post('professor/edit/{id}', [ProfessorController::class, 'editType']);
+    Route::get('semester_list', [SemesterController::class, 'index']);
+    Route::get('professor/{id}', [ProfessorController::class, 'fetchById']);
+    Route::get('acad_list', [AcademyYearController::class, 'index']);
+
+    //Contracts
+    Route::post('contract/create',[ContractController::class, 'store']);
+    Route::post('contract/update/{id}',[ContractController::class, 'update']);
+    Route::post('contract/download',[ContractController::class, 'download']);
+    Route::get('contract/show/{id}',[ContractController::class, 'show']);
+    Route::delete('contract/delete/{id}',[ContractController::class, 'destroy']);
+
+    //Permits
+    Route::post('permit/create',[PermitController::class, 'store']);
+    Route::post('permit/update/{id}',[PermitController::class, 'update']);
+    Route::delete('permit/delete/{id}',[PermitController::class, 'destroy']);
+
+    
 });

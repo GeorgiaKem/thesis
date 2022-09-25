@@ -69,11 +69,9 @@ export class ContractDetailsComponent implements OnInit {
     this._professorsService.getProfessorById(this.professorId)
       .subscribe(data => {
         this.contract_list = Object.entries(data)[14][1]
-        console.log(Object.entries(data))
         this.profType = Object.entries(data)[6][1]
 
         let found = false;
-        console.log('selected acad year', this.selectedAcadYear)
         this.contract_list.forEach(element => {
           if (element.sem_id == this.selectedAcadYear) {
             found = true;
@@ -81,11 +79,8 @@ export class ContractDetailsComponent implements OnInit {
         });
 
         if (found) {
-
-          console.log('has found')
           this.noContracts = false;
         } else {
-          console.log('has NO found')
 
           this.noContracts = true;
         }
@@ -108,17 +103,9 @@ export class ContractDetailsComponent implements OnInit {
           this.selectedAcadYear = this.semester_list[this.semester_list.length - 1].sem_id;
           this.selectedAcadYearName = this.semester_list[this.semester_list.length - 1].semester;
 
-          console.log('new selected', this.selectedAcadYear)
           this.fetchDataByProf()
         }
       })
-
-
-
-
-
-
-
 
     this.contractModel = new Contract(this.professorId, this.selectedAcadYear, null, null, null, null, null);
 
@@ -127,16 +114,9 @@ export class ContractDetailsComponent implements OnInit {
 
   }
 
-  onDelete(id) {
-
-  }
-
   onSelectAcademyYear(event) {
     this.selectedAcadYear = event.target.value;
     this.selectedAcadYearName = event.target.textContent;
-
-    console.log('trig')
-    console.log('sem', event.target.value)
 
 
     this.showDetails = true;
@@ -144,14 +124,12 @@ export class ContractDetailsComponent implements OnInit {
     let found = false;
 
     this.contract_list.forEach(element => {
-      console.log(element.sem_id)
       if (event.target.value == element.sem_id) {
         found = true;
       }
     });
 
     if (!found) {
-      console.log('without contract')
       this.noContracts = true;
     } else {
       this.noContracts = false;
@@ -179,15 +157,10 @@ export class ContractDetailsComponent implements OnInit {
         .subscribe(data => this.contractModel = new Contract(data['prof_id'], data['sem_id'], data['title'], data['description'], data['starts_at'], data['ends_at'], data['path']),
           error => this.errorMsg = error);
 
-      console.log('on load', this.contractModel)
-
       this.contractModel.starts_at = new Date(this.contractModel.starts_at)
       this.contractModel.ends_at = new Date(this.contractModel.ends_at)
 
       this.formState = 'editContract';
-
-      console.log('edit contract')
-      console.log('loaded data:', this.contractModel)
 
 
     } else {
@@ -213,9 +186,12 @@ export class ContractDetailsComponent implements OnInit {
 
       // Load last contract
       let lastContract = this.contract_list[this.contract_list.length - 1];
-      console.log(lastContract)
 
-      this.contractModel = new Contract(this.professorId, this.selectedAcadYear, lastContract.title, lastContract.description, lastContract.starts_at.split(' ')[0], lastContract.ends_at.split(' ')[0], null);
+      if (lastContract) {
+        this.contractModel = new Contract(this.professorId, this.selectedAcadYear, lastContract.title, lastContract.description, lastContract.starts_at.split(' ')[0], lastContract.ends_at.split(' ')[0], null);
+      }
+
+
     }
   }
 
@@ -232,6 +208,25 @@ export class ContractDetailsComponent implements OnInit {
       }
     });
   }
+
+  destroy(id) {
+
+    var self = this
+
+    this._contractService.delete(id).subscribe(data => {
+
+    }, error => this.errorMsg = error);
+
+    this.contract_list.forEach(function (value, index) {
+
+      if (id == value.id) {
+
+        delete self.contract_list[index];
+
+      }
+    });
+  }
+
 
   download(contract) {
     var filename = contract.path
@@ -255,7 +250,6 @@ export class ContractDetailsComponent implements OnInit {
       const formData = new FormData();
 
       formData.append("fileImage", file);
-      console.log(formData)
       this.contractModel.path = formData;
 
       const reader = new FileReader();
@@ -274,7 +268,6 @@ export class ContractDetailsComponent implements OnInit {
     if (this.formState == 'newContract') {
 
       this.contractModel.sem_id = this.selectedAcadYear
-      console.log(this.contractModel)
       this._contractService.createContract(this.contractModel)
         .subscribe(
           data => this.contract_list.push(data),
@@ -302,23 +295,6 @@ export class ContractDetailsComponent implements OnInit {
 
 
 
-  }
-  destroy(id) {
-
-    var self = this
-
-    this._contractService.delete(id).subscribe(data => {
-
-    }, error => this.errorMsg = error);
-
-    this.contract_list.forEach(function (value, index) {
-
-      if (id == value.id) {
-
-        delete self.contract_list[index];
-
-      }
-    });
   }
 
 
